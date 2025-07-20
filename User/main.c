@@ -1,20 +1,74 @@
-#include "stm32f10x.h"                  // Device header
+#include "stm32f10x.h"
 #include "Delay.h"
 #include "OLED.h"
+#include "Motor.h"
+#include "ENCODER.h"
+#include "Serial.h"
+#include "Control.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h> // 为了使用atof
+
+// PID FindLinePID; // 定义移至Control.c
+extern PID FindLinePID; // 声明外部全局变量
+float rho_err;
+int Base_Speed = 30; // 基础速度，可调
 
 int main(void)
 {
 	OLED_Init();
+	Motor_Init();
+	Encoder_Init();
+	Serial_Init();
 	
-	OLED_ShowChar(1, 1, 'A');
-	OLED_ShowString(1, 3, "HelloWorld!");
-	OLED_ShowNum(2, 1, 12345, 5);
-	OLED_ShowSignedNum(2, 7, -66, 2);
-	OLED_ShowHexNum(3, 1, 0xAA55, 4);
-	OLED_ShowBinNum(4, 1, 0xAA55, 16);
+	// 初始化循线PID参数，这些值需要后期调试确定
+	PID_Init(0.2, 0.0, 0.1);
+
+	OLED_ShowString(1, 1, "Waiting...");
 	
 	while (1)
 	{
-		
+		if (Serial_RxFlag == 1)
+		{
+			OLED_ShowString(1, 1, "Data:");
+			OLED_ShowString(2, 1, "                "); // 清空第二行
+			OLED_ShowString(2, 1, Serial_RxPacket);
+
+			if (Serial_RxPacket[0] == 'S')
+			{
+				Motor_Stop(); // 未检测到线，停车
+			}
+			else if (Serial_RxPacket[0] == 'E')
+			{
+				// 从 'E' 后面的字符开始，转换为浮点数
+				rho_err = atof(&Serial_RxPacket[1]);
+				
+				// 显示解析出的偏差值
+				OLED_ShowString(3, 1, "Err: ");
+				OLED_ShowSignedNum(3, 6, rho_err, 4);
+
+				// PID计算速度调整量
+				float Speed_Adjust = Position_PID_FindLine(rho_err);
+				
+				// 限制最大调整量
+				if(Speed_Adjust > Base_Speed) Speed_Adjust = Base_Speed;
+				if(Speed_Adjust < -Base_Speed) Speed_Adjust = -Base_Speed;
+
+				// 计算左右轮速度
+				int Left_Speed = Base_Speed - Speed_Adjust;
+				int Right_Speed = Base_Speed + Speed_Adjust;
+				
+				// 设置电机速度
+				MotorA_SetSpeed(Left_Speed);
+				MotorB_SetSpeed(Right_Speed);
+				
+				OLED_ShowString(4, 1, "L_S:");
+				OLED_ShowSignedNum(4, 5, Left_Speed, 3);
+				OLED_ShowString(4, 9, "R_S:");
+				OLED_ShowSignedNum(4, 13, Right_Speed, 3);
+			}
+			
+			Serial_RxFlag = 0; // 清除标志位
+		}
 	}
 }

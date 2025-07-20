@@ -1,15 +1,13 @@
 import sensor, image, time,pyb
-import display
 
 sensor.reset()
 sensor.set_pixformat(sensor.RGB565)
-sensor.set_framesize(sensor.QVGA)
+sensor.set_framesize(sensor.QQQVGA)
 sensor.skip_frames(time = 2000)
 sensor.set_vflip(True)
 sensor.set_hmirror(True)
 uart = pyb.UART(3, 9600)
-lcd = display.SPIDisplay()
-THRESHOLD = (18, 55, 27, 127, -17, 127)
+THRESHOLD = (0, 17, -86, 7, -92, 8)
 clock = time.clock()
 while(True):
     clock.tick()
@@ -22,16 +20,9 @@ while(True):
         else:
             theta_err = line.theta()
         img.draw_line(line.line(), color = 127)
-        lcd.write(img,x_scale=-0.5,y_scale=-0.5)
-        print(rho_err,line.magnitude(),rho_err)
-        uart.write("@%.1f,%.1f,%d\r\n" % (
-            rho_err,
-            theta_err,
-            line.magnitude()
-        ))
-        print("偏差:%.1fpx 角度:%.1f° 置信度:%d" %
-             (rho_err, theta_err, line.magnitude()))
+        # 串口发送简化版键值对协议
+        uart.write("E%.1f\r\n" % rho_err)
+        print("偏差:%.1fpx" % rho_err)
     else:
-        lcd.write(img,x=160,y=90,x_scale=0.5,y_scale=0.5)
-        uart.write("@null\r\n")
+        uart.write("S\r\n")
         print("未检测到黑线")

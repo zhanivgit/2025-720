@@ -29,10 +29,4 @@
 .\objects\control.o: .\Library\stm32f10x_usart.h
 .\objects\control.o: .\Library\stm32f10x_wwdg.h
 .\objects\control.o: .\Library\misc.h
-.\objects\control.o: D:\51\ARM\ARMCC\Bin\..\include\math.h
-.\objects\control.o: D:\51\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\control.o: Hardware\Motor.h
-.\objects\control.o: Hardware\ENCODER.h
-.\objects\control.o: Hardware\OLED.h
-.\objects\control.o: .\System\Delay.h
-.\objects\control.o: Hardware\LED.h
