@@ -22,7 +22,7 @@ int main(void)
 	Serial_Init();
 	
 	// 初始化循线PID参数，这些值需要后期调试确定
-	PID_Init(0.2, 0.0, 0.1);
+	PID_Init(3, 0.0, 0.1);
 
 	OLED_ShowString(1, 1, "...");
 	
@@ -30,10 +30,6 @@ int main(void)
 	{
 		if (Serial_RxFlag == 1)
 		{
-			OLED_ShowString(1, 1, "Data:");
-			OLED_ShowString(2, 1, "                "); // 清空第二行
-			OLED_ShowString(2, 1, Serial_RxPacket);
-
 			if (Serial_RxPacket[0] == 'S')
 			{
 				Motor_Stop(); // 未检测到线，停车
@@ -56,7 +52,7 @@ int main(void)
 
 				// 计算左右轮速度
 				int Left_Speed = Base_Speed - Speed_Adjust;
-				int Right_Speed = Base_Speed + Speed_Adjust;
+				int Right_Speed = -(Base_Speed + Speed_Adjust);
 				
 				// 设置电机速度
 				MotorA_SetSpeed(Left_Speed);
