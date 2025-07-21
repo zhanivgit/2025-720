@@ -122,43 +122,29 @@ void Serial_Printf(char *format, ...)
 // USART2??????
 void USART2_IRQHandler(void)
 {
-    static uint8_t RxState = 0;      // ?????
-    static uint8_t pRxPacket = 0;    // ???????
-    
-    if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
-    {
-        uint8_t RxData = USART_ReceiveData(USART2);
-        
-        if (RxState == 0)  // ??????
-        {
-            if (RxData == '@' && Serial_RxFlag == 0)
-            {
-                RxState = 1;
-                pRxPacket = 0;
-            }
-        }
-        else if (RxState == 1)  // ????
-        {
-            if (RxData == '\r')  // ?????
-            {
-                RxState = 2;
-            }
-            else
-            {
-                Serial_RxPacket[pRxPacket] = RxData;
-                pRxPacket++;
-            }
-        }
-        else if (RxState == 2)  // ?????
-        {
-            if (RxData == '\n')  // ?????
-            {
-                RxState = 0;
-                Serial_RxPacket[pRxPacket] = '\0';  // ??????
-                Serial_RxFlag = 1;                  // ????????
-            }
-        }
-        
-        USART_ClearITPendingBit(USART2, USART_IT_RXNE);  // ??????
-    }
+	static uint8_t pRxPacket = 0;
+	if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
+	{
+		uint8_t RxData = USART_ReceiveData(USART2);
+		
+		if (Serial_RxFlag == 0)
+		{
+			if (RxData != '\n')
+			{
+				if (RxData != '\r')
+				{
+					Serial_RxPacket[pRxPacket] = RxData;
+					pRxPacket++;
+				}
+			}
+			else
+			{
+				Serial_RxPacket[pRxPacket] = '\0';
+				pRxPacket = 0;
+				Serial_RxFlag = 1;
+			}
+		}
+		
+		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
+	}
 }

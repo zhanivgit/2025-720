@@ -12,7 +12,7 @@
 // PID FindLinePID; // 定义移至Control.c
 extern PID FindLinePID; // 声明外部全局变量
 float rho_err;
-int Base_Speed = 30; // 基础速度，可调
+int Base_Speed = 200; // 基础速度，可调
 
 int main(void)
 {
@@ -24,7 +24,7 @@ int main(void)
 	// 初始化循线PID参数，这些值需要后期调试确定
 	PID_Init(0.2, 0.0, 0.1);
 
-	OLED_ShowString(1, 1, "Waiting...");
+	OLED_ShowString(1, 1, "...");
 	
 	while (1)
 	{
@@ -60,7 +60,7 @@ int main(void)
 				
 				// 设置电机速度
 				MotorA_SetSpeed(Left_Speed);
-				MotorB_SetSpeed(Right_Speed);
+				MotorB_SetSpeed(-Right_Speed);
 				
 				OLED_ShowString(4, 1, "L_S:");
 				OLED_ShowSignedNum(4, 5, Left_Speed, 3);

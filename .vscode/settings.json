@@ -73,6 +73,12 @@
     "stm32f10x_gpio.h": "c",
     "oled.h": "c",
     "limits": "c",
-    "control.h": "c"
+    "control.h": "c",
+    "string.h": "c",
+    "serial.h": "c",
+    "oled_font.h": "c",
+    "stdio.h": "c",
+    "stm32f10x_tim.h": "c",
+    "stm32f10x_rcc.h": "c"
   }
 }

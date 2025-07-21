@@ -120,7 +120,7 @@ void MotorB_SetSpeed(int16_t speed)
   * 参    数：Speed 要设置的速度，范围：-100~100
   * 返 回 值：无
   */
-void Move(uint16_t speed)
+void Move(int16_t speed)
 {
 	MotorA_SetSpeed(speed);
 	MotorB_SetSpeed(speed);
